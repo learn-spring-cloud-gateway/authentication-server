@@ -4,6 +4,7 @@ import com.learn.authentication_server.model.Credential
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -17,15 +18,15 @@ class AuthController {
     private val secret: String? = null
 
     @GetMapping
-    fun getToken(): String {
+    fun getToken(): ResponseEntity<Token> {
         println("inside auth login")
-        return Jwts.builder()
+        return ResponseEntity.ok(Token(Jwts.builder()
             .claim("id", "ankitha")
             .claim("role", "admin")
             .setSubject("Test Token")
             .setIssuedAt(Date.from(Instant.now()))
             .setExpiration(Date.from(Instant.now().plus(10, ChronoUnit.MINUTES)))
-            .signWith(SignatureAlgorithm.HS256, secret).compact()
+            .signWith(SignatureAlgorithm.HS256, secret).compact()))
     }
 
     @PostMapping
@@ -42,3 +43,5 @@ class AuthController {
         return "LOGIN - POST"
     }
 }
+
+data class Token(val value: String)
